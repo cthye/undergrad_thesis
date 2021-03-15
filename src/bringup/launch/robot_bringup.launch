@@ -1,0 +1,3 @@
+<launch>
+ <include file="$(find bringup)/launch/includes/robot_bringup.launch.xml"/>
+</launch>

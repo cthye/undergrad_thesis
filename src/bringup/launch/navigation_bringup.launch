@@ -1,0 +1,20 @@
+<launch>
+  <!-- robot model -->
+  <include file="$(find bringup)/launch/includes/robot_bringup.launch.xml"/>
+
+  <!-- Map server -->
+  <arg name="map_name" default="123"/>
+  <include file="$(find map_server)/launch/my_map_server.launch.xml">
+    <arg name="map_name" value="$(arg map_name)"/>
+  </include>
+
+  <!-- Amcl -->
+  <include file="$(find amcl)/examples/my_amcl.launch.xml"/>
+
+  <!-- Move base -->
+  <include file="$(find move_base)/launch/my_move_base.launch.xml"/>
+
+  <!-- rviz -->
+  <!--<node name="rviz" pkg="rviz" type="rviz" args="-d $(find bringup)/rviz/simrobot_navigation.rviz" />-->
+
+</launch>

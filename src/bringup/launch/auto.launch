@@ -1,0 +1,17 @@
+<launch>
+  <!-- rosserial_smart_car_driver -->
+  <!--include file="$(find bringup)/launch/includes/robot_bringup.launch.xml"/-->
+  <node name="service_example" pkg="service_example" type="server.py" output="screen">
+  </node>
+
+
+
+
+
+
+  <!-- rosbrideg_descripition -->
+  <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/>
+
+
+
+</launch>

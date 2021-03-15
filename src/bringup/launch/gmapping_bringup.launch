@@ -1,0 +1,18 @@
+<launch>
+
+  <!-- robot model -->
+  
+  
+  <!-- slam_gmapping -->  
+  <include file="$(find gmapping)/launch/my_slam_gmapping.launch.xml"/>
+  <!--<include file="$(find gmapping)/launch/my_slam_gmapping_pr2.launch.xml"/>-->
+
+  <!-- Move base -->
+  <!--include file="$(find move_base)/launch/my_move_base.launch.xml"/-->
+
+  <!-- rviz -->
+  <!--<node name="rviz" pkg="rviz" type="rviz" args="-d $(find bringup)/rviz/simrobot_gmapping.rviz" />-->
+  
+  <!--include file="$(find frontier_exploration)/launch/global_map.launch" /-->
+
+</launch>

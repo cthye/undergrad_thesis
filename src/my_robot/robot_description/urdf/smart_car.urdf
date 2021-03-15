@@ -1,0 +1,187 @@
+<?xml version="1.0"?>
+<robot name="smart_car">
+    <material name="black">
+        <color rgba="0 0 0 1"/>
+    </material>
+    <material name="white">
+        <color rgba="1 1 1 1"/>
+    </material>
+    <material name="blue">
+        <color rgba="0.0 0.0 0.8 1.0"/>
+    </material>
+
+    <link name="base_footprint"/>
+    
+    <joint name="bash_link_joint" type="fixed">
+        <axis rpy="0 0 0" xyz="0 0 0"/>
+        <origin rpy="0 0 0" xyz="0 0 0.0565"/>
+        <parent link="base_footprint"/>
+        <child link="base_link"/>
+    </joint>
+
+    <link name="base_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://robot_description/meshes/base_link.dae"/>
+            </geometry>
+            <material name="black"/>
+        </visual>
+        <inertial>
+            <origin xyz="-0.036932 -3.6183E-09 5.4279E-05" rpy="0 0 0"/>
+            <mass value="0.62461"/>
+            <inertia ixx="0.002014" ixy="3.2092E-10" ixz="-5.0446E-05" iyy="0.0023871" iyz="5.0493E-08" izz="0.0027336"/>
+        </inertial>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://robot_description/meshes/base_link.dae"/>
+            </geometry>
+        </collision>
+    </link>
+
+
+    <link name="right_wheel">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://robot_description/meshes/right_wheel.dae"/>
+            </geometry>
+            <material name="white"/>
+        </visual>
+        <inertial>
+            <origin xyz="0 -0.0033767 0" rpy="0 0 0"/>
+            <mass value="0.052928"/>
+            <inertia ixx="2.1269E-05" ixy="-7.7807E-22" ixz="2.6095E-21" iyy="3.6821E-05" iyz="-1.6034E-21" izz="2.1269E-05"/>
+        </inertial>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://robot_description/meshes/right_wheel.dae"/>
+            </geometry>
+        </collision>
+    </link>
+    <joint name="right_wheel_joint" type="continuous">
+        <axis xyz="0 1 0"/>
+        <origin rpy="-7.0774E-16 -6.9389E-18 9.8142E-17" xyz="0 -0.0775 -0.024"/>
+        <limit effort="0.5" velocity="100"/>
+        <dynamics damping="0.0" friction="0.5"/>
+        <parent link="base_link"/>
+        <child link="right_wheel"/>
+    </joint>
+
+    <link name="left_wheel">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://robot_description/meshes/left_wheel.dae"/>
+            </geometry>
+            <material name="white"/>
+        </visual>
+        <inertial>
+            <origin xyz="0 0.0033767 0" rpy="0 0 0"/>
+            <mass value="0.052928"/>
+            <inertia ixx="2.1269E-05" ixy="-8.5384E-22" ixz="-1.5763E-21" iyy="3.6821E-05" iyz="1.4005E-21" izz="2.1269E-05"/>
+        </inertial>
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <mesh filename="package://robot_description/meshes/left_wheel.dae"/>
+            </geometry>
+        </collision>
+    </link>
+    <joint name="left_wheel_joint" type="continuous">
+        <axis xyz="0 1 0"/>
+        <origin rpy="-7.0774E-16 -6.9389E-18 9.8142E-17" xyz="0 0.0775 -0.024"/>
+        <limit effort="0.5" velocity="100"/>
+        <dynamics damping="0.0" friction="0.5"/>
+        <parent link="base_link"/>
+        <child link="left_wheel"/>
+    </joint>    
+
+    <link name="laser_link">
+        <inertial>
+            <mass value="1e-5"/>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
+        </inertial>
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="package://robot_description/meshes/rplidar.dae"/>
+            </geometry>
+            <material name="blue"/>
+        </visual>
+        <collision>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="package://robot_description/meshes/rplidar.dae"/> 
+            </geometry>
+        </collision>
+    </link>
+    <joint name="laser_link_joint" type="fixed">
+        <axis xyz="0 1 0"/>
+        <origin xyz="-0.045 0.0 0.07" rpy="0 0 0" />
+        <parent link="base_link"/>
+        <child link="laser_link"/>
+    </joint>
+
+    <link name="sonar">
+        <inertial>
+            <mass value="1e-5"/>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
+        </inertial>
+         <visual>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <box size="0.015 0.04 0.02"/>
+            </geometry>
+            <material name="my_green">
+                <color rgba="0.24 0.56 0.26 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <box size="0.015 0.04 0.02"/>
+            </geometry>
+        </collision>
+    </link>
+    <joint name="sonar_joint" type="fixed">
+        <axis xyz="0 1 0"/>
+        <origin xyz="0.045 0 0.0095"/>
+        <parent link="base_link"/>
+        <child link="sonar"/>
+    </joint>
+
+    <link name="infrared">
+        <inertial>
+            <mass value="1e-5"/>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
+        </inertial>
+         <visual>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <box size="0.01 0.028 0.008"/>
+            </geometry>
+            <material name="black">
+                <color rgba="0 0 0 1"/>
+            </material>
+        </visual>
+        <collision>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <box size="0.01 0.028 0.008"/>
+            </geometry>
+        </collision>
+    </link>
+    <joint name="infrared_joint" type="fixed">
+        <axis xyz="0 1 0"/>
+        <origin xyz="0.052 0 0.009"/>
+        <parent link="base_link"/>
+        <child link="infrared"/>
+    </joint>
+
+</robot>

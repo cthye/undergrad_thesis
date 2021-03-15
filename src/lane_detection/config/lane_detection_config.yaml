@@ -1,0 +1,72 @@
+# 调试选项
+debug_viz: 0 # 是否可视化
+viz_origin: 0
+viz_preprocess: 0
+viz_fit: 1
+viz_target_point: 1
+
+# 控制参数
+k_left: -1 # 左转比例系数
+k_right: -1 # 右转比例系数
+y_offset: 50 #276 # 目标点y偏移值
+turn_thres: 1 # 转弯斜率阈值
+step_threshold: 200 #跳变距离阈值
+accmulated_not_step_frames: 3  #跳变稳定帧数
+
+# 物理参数
+road_width: 500 #334 # pixel，路宽
+wheel_base: 570 # mm，轴心距
+dist_cv: 620 # mm, 相机坐标系与后轮轴心距离
+
+# 相关话题
+cmd_topic: "/cmd_vel"
+# 相机参数
+#video_path: "/home/zhz/ros_study/edu_car/src/lane_detection/test_video/record_1600914122.25.avi"
+video_path: '/dev/video10'
+frame_width: 640
+frame_height: 480
+
+# 透视变换参数
+x_real: 680.  # mm，世界坐标系最大x坐标
+y_real: 400. # mm, 世界坐标系最大y坐标
+# scale_factor_x = x_real / self.frame_width
+# scale_factor_y = y_real / self.frame_height
+# scale_factor = max(scale_factor_x, scale_factor_y) = 5.5625
+x_mm_per_pixel: 1.0625 # 2980. / 5.5625 / (568 - 47)
+y_mm_per_pixel: 0.8333 # 2670. / 5.5625 / (480-230)
+src_points: [[19,114], [631,101], [19,407], [634,438]] # pixel, 图像坐标
+dst_points: [[0., 0.], [680, 0], [0, 400], [430, 400]] # mm, 实际坐标
+turn_left_mid_x: 250 #188.7 # 994 / 2 / 2.633
+turn_right_mid_x: 250 #188.7
+
+# 掩膜参数
+use_mask: 0
+mask_ratio: 0.5
+
+# 预处理参数
+use_gray: 1
+use_otsu: 0
+gray_threshold: [200, 255]
+
+use_hsv: 1
+hsv_h_threshold: [0, 150]
+hsv_s_threshold: [0, 80]
+hsv_v_threshold: [170, 255]
+
+# 拟合方式
+hist_x_ratio: 1
+hist_y_ratio: 0
+hist_threshold: 1000 # 波峰阈值
+
+n_windows: 12 # 窗口数量
+min_windows: 5 # 最少的窗口数量
+min_pixels: 800 # 窗口内的像素数量
+window_width: 100 # 窗口宽度
+window_height: 36 # 窗口高度
+
+lane_y_ratio: 1 # 区分左右车道线的瞄点的y比例
+turn_y_ratio: 0 # 区分向左转还是向右转的瞄点的y比例
+inside_target_y_ratio: 0.5 # 内车道目标点的y比例
+outer_target_y_ratio: 0.125 # 外车道目标点的y比例
+turn_left_road_width_ratio: 1.4 # 转向时路宽比例
+turn_right_road_width_ratio: 0.9 # 转向时路宽比例

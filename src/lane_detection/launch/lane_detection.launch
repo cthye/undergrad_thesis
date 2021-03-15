@@ -1,0 +1,5 @@
+<launch>
+    <node name="lane_detection" pkg="lane_detection" type="lane_detection.py">
+        <rosparam command="load" file="$(find lane_detection)/config/lane_detection_config.yaml" />
+    </node>
+</launch>

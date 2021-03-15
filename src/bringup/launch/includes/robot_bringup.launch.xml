@@ -1,0 +1,37 @@
+<launch>
+  <!-- rosserial_smart_car_driver -->
+  <node name="smart_car" pkg="rosserial_python" type="serial_node.py" output="screen">
+    <param name="port" value="/dev/smart_car"/>
+    <param name="baud" value="115200"/>
+  </node>
+    <include file="$(find tf_odom_publish)/launch/tf_odom_node.launch"/>
+
+  <node name ="robot_pose_publiser" pkg="robot_pose_publiser" type="robot_pose_publiser">
+  </node>
+    <!-- 正式使用之前要进行一次校准 do_calib -->
+    <!-- 需要弄清楚原理和改变一下名字 -->
+
+    <!-- Publish static transform from base_footprint to imu_link -->
+    <node pkg="tf" type="static_transform_publisher" name="base_footprint_to_imu_link" args="0 0 0 0 0 0  /base_footprint /imu_link  100"/>
+
+    <!-- Publish robot odometry -->
+    <!-- 主要作用就是接收raw_odom后, 进行比例缩放(linear_scale), 然后发布odom -->
+    <node pkg="smart_car_base" name="smart_car_base_node" type="smart_car_base_node">
+    	<param name="linear_scale" type="double" value="1.05" />
+    </node>
+
+    <!-- Publish static transform from base_footprint to base_link -->
+    <node pkg="tf" type="static_transform_publisher" name="base_footprint_to_base_link" args="0 0 0.0565 0 0 0  /base_footprint /base_link  100"/>
+
+
+
+  <!-- robot_descripition -->
+  <include file="$(find robot_description)/launch/robot_description.launch"/>
+
+  <!-- launch laser -->
+  <!--include file="$(find ls01d)/launch/ls01d.launch"/> -->
+
+  <!-- launch laser_ls01b -->
+  <!-- <include file="$(find ls01b_v2)/launch/ls01b_v2.launch"/> -->
+
+</launch>
