@@ -1,0 +1,5 @@
+<launch>
+    <node name="traffic_detection_client" pkg="traffic_detection_client" type="traffic_detection_client.py" output="screen">
+        <rosparam command="load" file="$(find traffic_detection_client)/../config/traffic_detection_config.yaml" />
+    </node>
+</launch>

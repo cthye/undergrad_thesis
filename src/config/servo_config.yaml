@@ -1,0 +1,9 @@
+# topic param
+lane_cmd_topic: "/lane_cmd"
+cmd_topic: "/cmd_vel"
+traffic_data_topic: "/traffic_data_topic"
+
+# speed param
+speed_adjust_step: 0.01
+speed_lowerbound: 0.1
+speed_upperbound: 0.5

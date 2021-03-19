@@ -352,7 +352,7 @@ class LaneDetector:
         
         # if self.is_initial:
         #     self.cam_cmd.linear.z = 1
-        self.cam_cmd.linear.x = 0.1
+        self.cam_cmd.linear.x = 0.2
         self.cmd_pub.publish(self.cam_cmd)
         # if self.is_initial:
         #     self.cam_cmd.linear.z = 0
