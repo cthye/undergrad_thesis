@@ -4,6 +4,6 @@ cmd_topic: "/cmd_vel"
 traffic_data_topic: "/traffic_data_topic"
 
 # speed param
-speed_adjust_step: 0.01
-speed_lowerbound: 0.1
-speed_upperbound: 0.5
+speed_adjust_step: 0.001
+speed_lowerbound: 0.05
+speed_upperbound: 0.3

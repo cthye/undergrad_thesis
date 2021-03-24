@@ -3,6 +3,7 @@ import rospy
 from std_msgs.msg import Int32
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Bool
+from enum import Enum
 
 State = Enum('State', ('STOP', 'LANE_CONTROL', 'SPEEDUP', 'SPEEDDOWN'))
 
@@ -32,14 +33,17 @@ class ControllerManager:
         self.speed_upperbound = rospy.get_param('~speed_upperbound')
 
     def laneCmdCallback(self, msg):
-        rospy.loginfo(msg)
         #todo: control the car when lane is missing
         # if msg.angular.y > 0.5:
         #     rospy.loginfo('lost lane')
         #     # lane missing, stop it
         #     self.vel_msg.linear.x = 0
         # else:
-        self.vel_msg = msg
+        if self.state == State.LANE_CONTROL:
+            self.vel_msg = msg
+        else:
+            # other axis's speed remain
+            self.vel_msg.angular.z = msg.angular.z
     
     def trafficDataCallback(self, msg):
         '''
@@ -59,7 +63,8 @@ class ControllerManager:
         speed_unlimited = (msg.data >> 5) & 1
 
         if red_stop or pedestrain_crossing:
-            self.state = State.STOP
+            pass
+            #self.state = State.STOP
         elif green_go:
             self.state = State.LANE_CONTROL
         elif speed_limited or yellow_back:
@@ -68,6 +73,7 @@ class ControllerManager:
             self.state = State.SPEEDUP
     
     def adjust_speed(self):
+        print(self.state, self.vel_msg.linear.x)
         if self.state == State.STOP:
             self.vel_msg.linear.x = 0
             self.vel_msg.angular.z = 0
@@ -82,7 +88,6 @@ class ControllerManager:
         while not rospy.is_shutdown():
             self.adjust_speed()
             self.cmd_pub.publish(self.vel_msg)
-
             rate.sleep()
 
     def on_stop(self):

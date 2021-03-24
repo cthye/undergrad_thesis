@@ -1,5 +1,5 @@
 <launch>
-    <node name="servo" pkg="servo" type="servo_node.py">
+    <node name="servo" pkg="servo" type="servo_node.py" output="screen">
         <rosparam command="load" file="$(find servo)/../config/servo_config.yaml" />
     </node>
 </launch>
