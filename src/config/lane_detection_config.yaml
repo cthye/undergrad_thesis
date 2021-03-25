@@ -51,9 +51,9 @@ use_otsu: 0
 gray_threshold: [200, 255]
 
 use_hsv: 1
-hsv_h_threshold: [0, 150]
-hsv_s_threshold: [0, 80]
-hsv_v_threshold: [170, 255]
+hsv_h_threshold: [0, 100]
+hsv_s_threshold: [0, 20]
+hsv_v_threshold: [200, 255]
 
 # 拟合方式
 hist_x_ratio: 1

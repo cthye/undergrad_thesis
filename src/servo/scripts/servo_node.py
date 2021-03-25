@@ -5,7 +5,7 @@ from geometry_msgs.msg import Twist
 from std_msgs.msg import Bool
 from enum import Enum
 
-State = Enum('State', ('STOP', 'LANE_CONTROL', 'SPEEDUP', 'SPEEDDOWN'))
+State = Enum('State', ('STOP', 'LANE_CONTROL'))
 
 class ControllerManager:
     def __init__(self):
@@ -20,6 +20,7 @@ class ControllerManager:
 
         self.vel_msg = Twist()
         self.state = State.LANE_CONTROL
+        self.is_speed_limited = False
 
     def getParam(self):
         # msg topics
@@ -39,10 +40,11 @@ class ControllerManager:
         #     # lane missing, stop it
         #     self.vel_msg.linear.x = 0
         # else:
-        if self.state == State.LANE_CONTROL:
+        if self.state == State.LANE_CONTROL and not self.is_speed_limited:
             self.vel_msg = msg
+        
+        # always keep sending angular z
         else:
-            # other axis's speed remain
             self.vel_msg.angular.z = msg.angular.z
     
     def trafficDataCallback(self, msg):
@@ -62,24 +64,25 @@ class ControllerManager:
         speed_limited = (msg.data >> 4) & 1
         speed_unlimited = (msg.data >> 5) & 1
 
-        if red_stop or pedestrain_crossing:
-            pass
-            #self.state = State.STOP
-        elif green_go:
+        if red_stop:
+            self.state = State.STOP
+        elif green_go or yellow_back:
             self.state = State.LANE_CONTROL
-        elif speed_limited or yellow_back:
-            self.state = State.SPEEDDOWN
+        elif speed_limited:
+            self.is_speed_limited = True
         elif speed_unlimited:
-            self.state = State.SPEEDUP
+            self.is_speed_limited = False
     
     def adjust_speed(self):
         print(self.state, self.vel_msg.linear.x)
         if self.state == State.STOP:
             self.vel_msg.linear.x = 0
             self.vel_msg.angular.z = 0
-        elif self.state == State.SPEEDDOWN:
+        elif self.is_speed_limited:
+            print("speed down")
             self.vel_msg.linear.x = max(self.vel_msg.linear.x - self.speed_adjust_step, self.speed_lowerbound)
-        elif self.state == State.SPEEDUP:
+        elif not self.is_speed_limited:
+            print("speed up")
             self.vel_msg.linear.x = min(self.vel_msg.linear.x + self.speed_adjust_step, self.speed_upperbound)
 
     def spin(self):
