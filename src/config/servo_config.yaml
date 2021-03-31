@@ -1,5 +1,6 @@
 # topic param
 lane_cmd_topic: "/lane_cmd"
+laser_cmd_topic: "/laser_cmd"
 cmd_topic: "/cmd_vel"
 traffic_data_topic: "/traffic_data_topic"
 
@@ -7,3 +8,7 @@ traffic_data_topic: "/traffic_data_topic"
 speed_adjust_step: 0.001
 speed_lowerbound: 0.05
 speed_upperbound: 0.1
+
+# threshold
+lost_laser_threshold: 3
+lost_lane_threshold: 5

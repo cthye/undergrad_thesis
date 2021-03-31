@@ -1,0 +1,25 @@
+<launch>
+    <include file="$(find laser_detection)/../laser_ls01d/launch/ls01d.launch"/>
+
+    <node name="laser_detection" pkg="laser_detection" type="laser_detection_node" output="screen">
+        <rosparam command="load" file="$(find laser_detection)/../config/laser_detection_config.yaml" />
+    </node>
+
+    <node name="line_extractor" pkg="laser_line_extraction" type="line_extraction_node">
+        <param name="~frequency" value="20.0" />
+        <param name="~frame_id" value="laser" />
+        <param name="~scan_topic" value="scan" />
+        <param name="~publish_markers" value="true" />
+        <param name="~bearing_std_dev" value="1e-5" />
+        <param name="~range_std_dev" value="0.012" />
+        <param name="~least_sq_angle_thresh" value="0.0001" />
+        <param name="~least_sq_radius_thresh" value="0.0001" />
+        <param name="~max_line_gap" value="0.1" />
+        <param name="~min_line_length" value="0.3" />
+        <param name="~min_range" value="0.0" /> 
+        <param name="~max_range" value="3.0" />
+        <param name="~min_split_dist" value="0.04" />
+        <param name="~outlier_dist" value="0.06" />
+        <param name="~min_line_points" value="10" />
+    </node>
+</launch>
