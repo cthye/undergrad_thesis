@@ -51,7 +51,7 @@ class LaneDetector:
         if not self.cap.isOpened():
             rospy.logfatal('Open videoCapture failed!')
             exit(-1)
-
+        
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH,  self.frame_width)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.frame_height)
 
@@ -117,7 +117,7 @@ class LaneDetector:
         self.accmulated_not_step=0
         self.is_ok=True
         self.map1,self.map2=self.initialize_perspective_to_maps()
-
+    
     def initialize_perspective_to_maps(self):
         warp_mat=self.warp_mat.astype(np.float32)
         inv_perspective=np.linalg.inv(warp_mat)
@@ -135,7 +135,7 @@ class LaneDetector:
 
     def spin(self):
         ret, img = self.cap.read()
-        self.img=img
+        self.img=img   
         if ret:
             if self.viz_origin:
                 cv2.imshow('origin', img)
@@ -173,7 +173,7 @@ class LaneDetector:
     def binaryzation(self, img):
         if self.use_mask:
             img = cv2.bitwise_and(img, self.mask)
-
+    
         # 灰度阈值
         img = cv2.medianBlur(img, 5)
         if self.use_gray:
@@ -191,12 +191,12 @@ class LaneDetector:
             hsv_binary=cv2.inRange(hsv_img,(self.hsv_h_threshold[0],self.hsv_s_threshold[0],self.hsv_v_threshold[0]),( self.hsv_h_threshold[1], self.hsv_s_threshold[1],self.hsv_v_threshold[1]))
         # 组合
         # combined = np.zeros_like(origin_thr)
-        # combined[(hsv_binary == 255) & (origin_thr == 255)] = 255
-        combined = cv2.bitwise_and(hsv_binary, origin_thr)
+        # combined[(hsv_binary == 255) & (origin_thr == 255)] = 255          
+        combined = cv2.bitwise_and(hsv_binary, origin_thr)  
         # 透视变换
         binary_warped=cv2.remap(combined,self.map1,self.map2,cv2.INTER_LINEAR)
         binary_warped=cv2.GaussianBlur(binary_warped,(7,7),0)
-        if self.viz_preprocess and self.debug_viz:
+        if self.viz_preprocess and self.debug_viz:        
             cv2.imshow('gray', origin_thr)
             cv2.imshow('hsv', hsv_binary)
             cv2.imshow('preprocess', combined)
@@ -205,7 +205,7 @@ class LaneDetector:
     def fitLine(self, binary_warped):
         hist_x = np.sum(binary_warped[int(self.hist_y_ratio*binary_warped.shape[1]):, :int(self.hist_x_ratio*binary_warped.shape[0])], axis=0) # 只看下半部分
         lane_base = np.argmax(hist_x)
-
+            
         nonzero = binary_warped.nonzero()
         nonzeroy = np.array(nonzero[0])
         nonzerox = np.array(nonzero[1])
@@ -229,7 +229,7 @@ class LaneDetector:
             high_inds= (pixel_common & (nonzeroy < (win_y_low+5))).nonzero()[0]
             if len(good_inds) > minpix:
                 good_window_num += 1
-                lane_inds.append(good_inds)
+                lane_inds.append(good_inds) 
                 if   len(high_inds)>0:
                     lane_current=int(np.mean(nonzerox[high_inds]))
                 else:
@@ -244,12 +244,12 @@ class LaneDetector:
             lane_inds = np.concatenate(lane_inds)
             pixelX = nonzerox[lane_inds]
             pixelY = nonzeroy[lane_inds]
-
+       
         if (pixelX.size == 0):
             return None
-
+       
         model = np.polyfit(pixelY,pixelX, 2)
-
+        
         if self.viz_fit and self.debug_viz:
             x = np.polyval(model, pixelY)
             draw_points = (np.asarray([x, pixelY]).T).astype(np.int32)   # needs to be int32 and transposed
@@ -304,7 +304,7 @@ class LaneDetector:
         #     if self.correct_detect_time>4:
         #         self.is_initial = False
         #         print('initialize finish')
-
+            
         #     # 尽量贴线
         #     LorR *= 0.475
 
@@ -316,9 +316,9 @@ class LaneDetector:
 
         if lane == "outside":
             target_y = sorted_pixel_y[int(len(pixelY) * self.outer_target_y_ratio)]
-        else:
+        else:  
             target_y = sorted_pixel_y[int(len(pixelY) * self.inside_target_y_ratio)]
-
+        
         target_point = [pixelX[target_y], pixelY[target_y]]  # 用于计算驾驶角度的目标点
         slope_of_target_point = 2 * a * target_point[1] + b
         theta = math.atan(slope_of_target_point)
@@ -329,7 +329,7 @@ class LaneDetector:
         self.aP[0] = (x - mid_x) * self.x_mm_per_pixel
         self.aP[1] = (binary_warped.shape[0] - y) * self.y_mm_per_pixel + self. y_offset
         steer_angle = math.atan(2 * self.wheel_base * self.aP[0] / (self.aP[0] * self.aP[0] + (self.aP[1] + self.dist_cv) * (self.aP[1] + self.dist_cv)))
-        #增加控制稳定性,利用目标点跳变判断
+        #增加控制稳定性,利用目标点跳变判断        
         ap_changed_distance=0
         if self.begin_run==True:
             self.begin_run=False
@@ -352,7 +352,7 @@ class LaneDetector:
                 self.cam_cmd.angular.z = self.k_left * steer_angle
             else:
                 self.cam_cmd.angular.z = self.k_right * steer_angle
-
+        
         # if self.is_initial:
         #     self.cam_cmd.linear.z = 1
         self.cam_cmd.linear.x = 0.1
@@ -387,7 +387,7 @@ if __name__ == '__main__':
     # plt.ion()
     rospy.init_node('lane_detection', anonymous=True)
     rate = rospy.Rate(30)
-
+    
     lane_detector = LaneDetector()
     while not rospy.is_shutdown():
         # cProfile.run('lane_detector.spin()', sort="cumulative")
