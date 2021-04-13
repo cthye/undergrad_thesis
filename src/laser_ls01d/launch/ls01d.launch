@@ -12,5 +12,5 @@
         <param name="inverted" value="$(arg inverted)"/>           # 如果0度方向在串口线的方向上设置为true 
     </node>
 
-<!--<node name="rviz" pkg="rviz" type="rviz" args="-d $(find ls01d)/launch/rviz.rviz"/>-->
+<node name="rviz" pkg="rviz" type="rviz" args="-d $(find ls01d)/launch/rviz.rviz"/>
 </launch>

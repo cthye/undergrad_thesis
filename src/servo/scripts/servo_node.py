@@ -26,7 +26,7 @@ class ControllerManager:
 
         self.lost_lane = 0 # times of lossing lane
         self.lost_laser = 0 # times of lossing laser
-        self.get_laser = 0 
+        self.get_laser = 0
 
     def getParam(self):
         # msg topics
@@ -43,6 +43,7 @@ class ControllerManager:
         # threshold
         self.lost_laser_threshold = rospy.get_param('~lost_laser_threshold')
         self.lost_lane_threshold = rospy.get_param('~lost_lane_threshold')
+        self.get_laser_threshold = rospy.get_param('~get_laser_threshold')
 
     def laneCmdCallback(self, msg):
         #todo: control the car when lane is missing
@@ -57,6 +58,7 @@ class ControllerManager:
             if msg.angular.y == 0:
                 self.lost_lane = 0
             elif msg.angular.y > 0.5:
+                print('lost lane', self.lost_lane, ' get_laser', self.get_laser)
                 self.lost_lane += 1
                 self.get_lane = 0
                 if self.lost_lane >= self.lost_lane_threshold and self.get_laser >= self.get_laser_threshold:
@@ -64,12 +66,12 @@ class ControllerManager:
                     print('lost lane, turn to LASER_CONTROL')
                     return
 
-        if self.state == State.LANE_CONTROL and not self.is_speed_limited:
-            self.vel_msg = msg
-        
-        # always keep sending angular z
-        else:
-            self.vel_msg.angular.z = msg.angular.z
+            if not self.is_speed_limited:
+                self.vel_msg = msg
+
+            # always keep sending angular z
+            else:
+                self.vel_msg.angular.z = msg.angular.z
 
     def laserCmdCallback(self, msg):
 
@@ -83,6 +85,10 @@ class ControllerManager:
                     self.state = State.LANE_CONTROL
                     print('lost laser, turn to LANE_CONTROL')
                     return
+            if not self.is_speed_limited:
+                self.vel_msg = msg
+            else:
+                self.vel_msg.angular.z = msg.angular.z
 
         if self.state == State.LANE_CONTROL and msg.angular.y == 0:
             #calculate the times of receiving line while lane detection works well
@@ -90,13 +96,6 @@ class ControllerManager:
         else:
             self.get_laser = 0
 
-        if self.state == State.LASER_CONTROL and not self.is_speed_limited:
-            self.vel_msg = msg
-        
-        # always keep sending angular z
-        else:
-            self.vel_msg.angular.z = msg.angular.z
-    
     def trafficDataCallback(self, msg):
         '''
         0: red_stop
@@ -122,7 +121,7 @@ class ControllerManager:
             self.is_speed_limited = True
         elif speed_unlimited:
             self.is_speed_limited = False
-    
+
     def adjust_speed(self):
         print(self.state, self.vel_msg.linear.x)
         if self.state == State.STOP:
@@ -137,7 +136,7 @@ class ControllerManager:
 
     def spin(self):
         rate = rospy.Rate(20)
-        
+
         while not rospy.is_shutdown():
             self.adjust_speed()
             self.cmd_pub.publish(self.vel_msg)

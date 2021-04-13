@@ -10,5 +10,6 @@ speed_lowerbound: 0.05
 speed_upperbound: 0.1
 
 # threshold
-lost_laser_threshold: 3
-lost_lane_threshold: 5
+lost_laser_threshold: 5
+lost_lane_threshold: 10
+get_laser_threshold: 3

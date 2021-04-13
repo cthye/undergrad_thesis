@@ -1,13 +1,9 @@
-debug_viz: 0
+debug_viz: 1  
 
 # 话题与坐标系
-frame_id: laser
+frame_id: laser_link
 # obstacle_info_topic: "/auto_driver/obstacle_info"
 cmd_topic: "/laser_cmd"
-
-# 前方动态避障参数
-front_angle: 5 # deg, 前方障碍物检测角度，区间为[-x, x]
-front_alarm_distance: 2 # m, 前方障碍物报警阈值
 
 # 静态挡板参数
 slope_tolerance: 1.7 # 斜率容差值
@@ -16,19 +12,6 @@ max_slope_diff: 0.5 # 斜率之差值值
 max_dist: 2 # m, 两直线的最大距离
 
 # 控制参数
-x_target: 1 # m, 目标点在小车正前方的偏移值
-wheel_base: 0.57 # m，轴心距
-k_cmd: 3.6 # 驾驶角度系数
-
-# 停车参数
-reference_line_slope_range: 1.1
-adjust_angle_ratio: 1.1
-reference_line_distance_tolerance: 0.7
-begin_find_angle_line: 0.13
-remainDistance_max: 0.45
-mid_point_distance_max: 0.56
-reference_line_distance_min: 0.4
-reference_line_distance_max: 0.5
-reference_distance_angle_control_ratio: 5
-target_point_x: 1.2
-parking_speed: 27
+x_target: 0.5 # m, 目标点在小车正前方的偏移值
+wheel_base: 0.1 # m，轴心距
+k_cmd: 0.5 # 驾驶角度系数
