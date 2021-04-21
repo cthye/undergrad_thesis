@@ -58,9 +58,8 @@ class ControllerManager:
             if msg.angular.y == 0:
                 self.lost_lane = 0
             elif msg.angular.y > 0.5:
-                print('lost lane', self.lost_lane, ' get_laser', self.get_laser)
+                rospy.loginfo_throttle(1, 'lost lane:%s, get laser:%s'%(self.lost_lane,self.get_laser))
                 self.lost_lane += 1
-                self.get_lane = 0
                 if self.lost_lane >= self.lost_lane_threshold and self.get_laser >= self.get_laser_threshold:
                     self.state = State.LASER_CONTROL
                     print('lost lane, turn to LASER_CONTROL')
@@ -81,9 +80,10 @@ class ControllerManager:
                 self.lost_laser = 0
             elif msg.angular.y > 0.5:
                 self.lost_laser += 1
+                rospy.loginfo_throttle(1, 'lost laser:%s'%self.lost_laser)
                 if self.lost_laser >= self.lost_laser_threshold:
                     self.state = State.LANE_CONTROL
-                    print('lost laser, turn to LANE_CONTROL')
+                    rospy.loginfo_throttle(5, 'lost laser, turn to LANE_CONTROL')
                     return
             if not self.is_speed_limited:
                 self.vel_msg = msg
@@ -123,15 +123,15 @@ class ControllerManager:
             self.is_speed_limited = False
 
     def adjust_speed(self):
-        print(self.state, self.vel_msg.linear.x)
+        rospy.loginfo_throttle(5, "state:%s, speed:%s"%(self.state, self.vel_msg.linear.x))
         if self.state == State.STOP:
             self.vel_msg.linear.x = 0
             self.vel_msg.angular.z = 0
         elif self.is_speed_limited:
-            print("speed down")
+            #print("speed down")
             self.vel_msg.linear.x = max(self.vel_msg.linear.x - self.speed_adjust_step, self.speed_lowerbound)
         elif not self.is_speed_limited:
-            print("speed up")
+            #print("speed up")
             self.vel_msg.linear.x = min(self.vel_msg.linear.x + self.speed_adjust_step, self.speed_upperbound)
 
     def spin(self):

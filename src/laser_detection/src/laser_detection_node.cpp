@@ -81,7 +81,7 @@ void LaserDetector::lineSegmentsCallback(
     const laser_line_extraction::LineSegmentList::ConstPtr &msg) {
     geometry_msgs::Twist cmd;
     if (msg->line_segments.size() < 2) {
-        //ROS_INFO_STREAM_THROTTLE(3, "too few lines: 0");
+        ROS_INFO_STREAM_THROTTLE(3, "too few lines: 0");
         cmd.angular.y = 1;  // 转为车道线控制
         cmd_pub_.publish(cmd);
         return;
@@ -132,7 +132,7 @@ void LaserDetector::lineSegmentsCallback(
     }
 
     if (lines.size() < 2) {
-        //ROS_INFO_STREAM_THROTTLE(3, "too few lines: 1");
+        ROS_INFO_STREAM_THROTTLE(3, "too few lines: 1");
         cmd.angular.y = 1;  // 转为车道线控制
         cmd_pub_.publish(cmd);
         return;
@@ -165,9 +165,9 @@ void LaserDetector::lineSegmentsCallback(
 
         // ROS_DEBUG_STREAM("diff < slope_product_tolerance_: " << (diff <
         // slope_product_tolerance_));
-        ROS_INFO_STREAM("y_intercept1 * y_intercept2 <= 0: " <<
-         (y_intercept1 * lines[i].yIntercept() <= 0));
-        ROS_INFO_STREAM("dist(" << dist << ") < min_dist(" << min_dist << "): " << (dist < min_dist));
+        // ROS_INFO_STREAM("y_intercept1 * y_intercept2 <= 0: " <<
+        //  (y_intercept1 * lines[i].yIntercept() <= 0));
+        // ROS_INFO_STREAM("dist(" << dist << ") < min_dist(" << min_dist << "): " << (dist < min_dist));
         if (slope_diff < max_slope_diff_ &&
             (lines[i].yIntercept() * y_intercept1 <= 0) && (dist < min_dist)) {
             l2_index = i;
@@ -198,8 +198,8 @@ void LaserDetector::lineSegmentsCallback(
 
     float steer_angle = atan(2 * wheel_base_ * (-y_target) /
                              (x_target_ * x_target_ + y_target * y_target));
-    cmd.angular.z = k_cmd_ * steer_angle;
-    cmd.linear.x = 0.07;
+    cmd.angular.z = - k_cmd_ * steer_angle;
+    cmd.linear.x = 0.2;
     cmd_pub_.publish(cmd);
 
     if (debug_viz_) {

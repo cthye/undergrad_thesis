@@ -9,9 +9,9 @@ cmd_topic: "/laser_cmd"
 slope_tolerance: 1.7 # 斜率容差值
 max_slope_diff: 0.5 # 斜率之差值值
 # slope_product_tolerance: 3 # 斜率与其垂线乘积容差值
-max_dist: 2 # m, 两直线的最大距离
+max_dist: 1 # m, 两直线的最大距离
 
 # 控制参数
-x_target: 0.5 # m, 目标点在小车正前方的偏移值
-wheel_base: 0.1 # m，轴心距
-k_cmd: 0.5 # 驾驶角度系数
+x_target: 0.25 # m, 目标点在小车正前方的偏移值
+wheel_base: 0.57 # m，轴心距
+k_cmd: 0.1 # 驾驶角度系数
