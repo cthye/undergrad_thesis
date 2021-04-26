@@ -1,0 +1,3 @@
+traffic_data: "/traffic_data_topic"
+model_file: "/home/cthye/Desktop/scut/undergrad_thesis/my_ws/src/yolov5/asset/best.bin"
+param_file: "/home/cthye/Desktop/scut/undergrad_thesis/my_ws/src/yolov5/asset/best.param"

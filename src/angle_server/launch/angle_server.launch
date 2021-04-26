@@ -1,5 +1,0 @@
-<launch>
-    <node name="angle_server" pkg="angle_server" type="angle_server.py">
-    </node>
-</launch>
-
