@@ -9,6 +9,8 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/videoio.hpp>
 #include <vector>
+#include <chrono>
+using namespace std::chrono;
 
 class YoloV5Focus : public ncnn::Layer {
    public:
@@ -224,18 +226,23 @@ class YoloV5 {
     YoloV5();
     int detect_yolov5(const cv::Mat& bgr, std::vector<Object>& objects);
     void draw_objects(const cv::Mat& bgr, const std::vector<Object>& objects);
+    std::string videoPath;
+    bool isDebug;
 
    private:
     ros::NodeHandle nh_;
-    std::string model_file, param_file, traffic_data_topic;
+    ros::NodeHandle pub_nh_;
+    std::string model_file_, param_file_, traffic_data_topic_;
     ros::Publisher traffic_pub_;
 };
 
-YoloV5::YoloV5() : nh_("~") {
-    nh_.getParam("model_file", model_file);
-    nh_.getParam("param_file", param_file);
-    nh_.getParam("traffic_data_topic", traffic_data_topic);
-    traffic_pub_ = nh_.advertise<std_msgs::Int8>(traffic_data_topic.c_str(), 1);
+YoloV5::YoloV5() : pub_nh_(), nh_("~") {
+    nh_.getParam("model_file", model_file_);
+    nh_.getParam("param_file", param_file_);
+    nh_.getParam("traffic_data_topic", traffic_data_topic_);
+    nh_.getParam("videoPath", videoPath);
+    nh_.getParam("isDebug", isDebug);
+    traffic_pub_ = pub_nh_.advertise<std_msgs::Int8>(traffic_data_topic_.c_str(), 1);
 }
 
 int YoloV5::detect_yolov5(const cv::Mat& bgr, std::vector<Object>& objects) {
@@ -248,8 +255,8 @@ int YoloV5::detect_yolov5(const cv::Mat& bgr, std::vector<Object>& objects) {
 
     // original pretrained model from https://github.com/ultralytics/yolov5
     // the ncnn model https://github.com/nihui/ncnn-assets/tree/master/models
-    yolov5.load_param(param_file.c_str());
-    yolov5.load_model(model_file.c_str());
+    yolov5.load_param(param_file_.c_str());
+    yolov5.load_model(model_file_.c_str());
 
     const int target_size = 416;
     const float prob_threshold = 0.25f;
@@ -359,7 +366,6 @@ int YoloV5::detect_yolov5(const cv::Mat& bgr, std::vector<Object>& objects) {
     nms_sorted_bboxes(proposals, picked, nms_threshold);
 
     int count = picked.size();
-    ROS_INFO_STREAM("COUNT: " << count);
     objects.resize(count);
     for (int i = 0; i < count; i++) {
         objects[i] = proposals[picked[i]];
@@ -394,10 +400,8 @@ void YoloV5::draw_objects(const cv::Mat& bgr,
                                         "speed_limited", "speed_unlimited"};
 
     cv::Mat image = bgr.clone();
-    ROS_INFO_STREAM("IN DRAW");
     for (size_t i = 0; i < objects.size(); i++) {
         const Object& obj = objects[i];
-        ROS_INFO_STREAM("LABEL: " << obj.label);
         fprintf(stderr, "%d = %.5f at %.2f %.2f %.2f x %.2f\n", obj.label,
                 obj.prob, obj.rect.x, obj.rect.y, obj.rect.width,
                 obj.rect.height);
@@ -423,46 +427,49 @@ void YoloV5::draw_objects(const cv::Mat& bgr,
             traffic_pub_.publish(msg);
         }
 
-        /*cv::rectangle(image, obj.rect, cv::Scalar(255, 0, 0));
+        if(isDebug) {
+            cv::rectangle(image, obj.rect, cv::Scalar(255, 0, 0));
 
-        char text[256];
-        sprintf(text, "%s %.1f%%", class_names[obj.label], obj.prob * 100);
+            char text[256];
+            sprintf(text, "%s %.1f%%", class_names[obj.label], obj.prob * 100);
 
-        int baseLine = 0;
-        cv::Size label_size = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX,
-        0.5, 1, &baseLine);
+            int baseLine = 0;
+            cv::Size label_size = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX,
+            0.5, 1, &baseLine);
 
-        int x = obj.rect.x;
-        int y = obj.rect.y - label_size.height - baseLine;
-        if (y < 0)
-            y = 0;
-        if (x + label_size.width > image.cols)
-            x = image.cols - label_size.width;
+            int x = obj.rect.x;
+            int y = obj.rect.y - label_size.height - baseLine;
+            if (y < 0)
+                y = 0;
+            if (x + label_size.width > image.cols)
+                x = image.cols - label_size.width;
 
-        cv::rectangle(image, cv::Rect(cv::Point(x, y),
-        cv::Size(label_size.width, label_size.height + baseLine)),
-                      cv::Scalar(255, 255, 255), -1);
+            cv::rectangle(image, cv::Rect(cv::Point(x, y),
+            cv::Size(label_size.width, label_size.height + baseLine)),
+                        cv::Scalar(255, 255, 255), -1);
 
-        cv::putText(image, text, cv::Point(x, y + label_size.height),
-                    cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 0, 0));*/
+            cv::putText(image, text, cv::Point(x, y + label_size.height),
+                        cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 0, 0));        
+        }
     }
-
-    // cv::imshow("image", image);
-    // cv::waitKey(0);
+    if(isDebug) {
+        cv::imshow("image", image);
+        cv::waitKey(10);
+    }
 }
 
 int main(int argc, char** argv) {
     ros::init(argc, argv, "yolov5_node");
+    YoloV5 yolov5;
     cv::VideoCapture cap;
-    cap.open(0);
+    cap.open(yolov5.videoPath);
     if (!cap.isOpened()) {
         fprintf(stderr, "cannot open camera\n");
         return -1;
     }
+    cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M','J','P','G'));
     cap.set(cv::CAP_PROP_FRAME_HEIGHT, 640);
     cap.set(cv::CAP_PROP_FRAME_WIDTH, 480);
-
-    YoloV5 yolov5;
 
     while (ros::ok()) {
         cv::Mat m;
@@ -471,17 +478,15 @@ int main(int argc, char** argv) {
             fprintf(stderr, "cv::imread() failed\n");
             return -1;
         }
-        // cv::imshow("frame", m);
         std::vector<Object> objects;
-        ROS_INFO_STREAM("get image");
+        auto begin = high_resolution_clock::now();
         yolov5.detect_yolov5(m, objects);
-
+        auto duration = duration_cast<microseconds>(high_resolution_clock::now() - begin);
+        fprintf(stderr, "--------infer period:%ld-------\n", duration.count());
         yolov5.draw_objects(m, objects);
 
-        if (cv::waitKey(33) == 27) break;  // ESC
     }
 
     cap.release();
-    // cv::destroyWindow("frame");
     return 0;
 }

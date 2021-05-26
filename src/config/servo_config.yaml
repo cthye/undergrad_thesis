@@ -6,8 +6,8 @@ traffic_data_topic: "/traffic_data_topic"
 
 # speed param
 speed_adjust_step: 0.001
-speed_lowerbound: 0.05
-speed_upperbound: 0.1
+speed_lowerbound: 0.1
+speed_upperbound: 0.2
 
 # threshold
 lost_laser_threshold: 5

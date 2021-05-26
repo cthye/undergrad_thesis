@@ -1,3 +1,5 @@
-traffic_data: "/traffic_data_topic"
-model_file: "/home/cthye/Desktop/scut/undergrad_thesis/my_ws/src/yolov5/asset/best.bin"
-param_file: "/home/cthye/Desktop/scut/undergrad_thesis/my_ws/src/yolov5/asset/best.param"
+traffic_data_topic: "/traffic_data_topic"
+model_file: "/home/pi/autodrive_ws/src/yolov5/asset/best-opt.bin"
+param_file: "/home/pi/autodrive_ws/src/yolov5/asset/best-opt.param"
+videoPath: "/dev/video10"
+isDebug: false

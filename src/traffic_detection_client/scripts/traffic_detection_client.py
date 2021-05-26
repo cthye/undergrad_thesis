@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 import rospy
 import socket
-from std_msgs.msg import Int32
+from std_msgs.msg import Int8
 import threading
 import time
 import math
@@ -39,7 +39,7 @@ def connect(socket, host, port):
 
 def talker():
     traffic_data_topic = rospy.get_param('~traffic_data_topic')
-    traffic_data_pub = rospy.Publisher(traffic_data_topic, Int32, queue_size=10)
+    traffic_data_pub = rospy.Publisher(traffic_data_topic, Int8, queue_size=10)
 
     # see configuration in index.py
     host = '192.168.2.111'
@@ -51,6 +51,7 @@ def talker():
     connect_thread.join()
 
     rate = rospy.Rate(10)  # 10hz
+    last = time.time()
     while not rospy.is_shutdown():
         data = s.recv(1024)
         recv_data = parse_data(data)
@@ -58,6 +59,9 @@ def talker():
             break
         print(recv_data)
         if recv_data > 0:
+            now = time.time()
+            print("period---------%fseconds----------"% (now - last))
+            last = now
             #? 如果同一张图片识别出多个box，那data不是应该有多个1..
             status_num = math.log(recv_data, 2)
             print(status_list[int(status_num)])
@@ -65,7 +69,7 @@ def talker():
         traffic_data_pub.publish(recv_data)
         rate.sleep()
     s.close()
-
+    
 
 if __name__ == '__main__':
     rospy.init_node('talker', anonymous=True)

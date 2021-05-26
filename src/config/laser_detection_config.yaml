@@ -15,3 +15,5 @@ max_dist: 1 # m, 两直线的最大距离
 x_target: 0.25 # m, 目标点在小车正前方的偏移值
 wheel_base: 0.57 # m，轴心距
 k_cmd: 0.1 # 驾驶角度系数
+
+speed: 0.2

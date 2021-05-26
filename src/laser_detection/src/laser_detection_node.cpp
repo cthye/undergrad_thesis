@@ -3,6 +3,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <chrono>
 
 #include <visualization_msgs/Marker.h>
 #include "geometry_msgs/Twist.h"
@@ -11,6 +12,7 @@
 #include "ros/ros.h"
 #include "sensor_msgs/LaserScan.h"
 #include "std_msgs/Int32.h"
+using namespace std::chrono;
 
 struct Line {
     laser_line_extraction::LineSegment line_segment;
@@ -46,6 +48,7 @@ class LaserDetector {
     float x_target_;
     float wheel_base_;
     float k_cmd_;
+    float speed_;
 
     void lineSegmentsCallback(
         const laser_line_extraction::LineSegmentList::ConstPtr &msg);
@@ -63,6 +66,7 @@ LaserDetector::LaserDetector() : nh_(), private_nh_("~") {
     private_nh_.getParam("k_cmd", k_cmd_);
     private_nh_.getParam("debug_viz", debug_viz_);
     private_nh_.getParam("frame_id", frame_id_);
+    private_nh_.getParam("speed", speed_);
 
     cmd_pub_ = nh_.advertise<geometry_msgs::Twist>(cmd_topic.c_str(), 1);
 
@@ -79,6 +83,7 @@ LaserDetector::LaserDetector() : nh_(), private_nh_("~") {
 
 void LaserDetector::lineSegmentsCallback(
     const laser_line_extraction::LineSegmentList::ConstPtr &msg) {
+    auto start = high_resolution_clock::now();
     geometry_msgs::Twist cmd;
     if (msg->line_segments.size() < 2) {
         ROS_INFO_STREAM_THROTTLE(3, "too few lines: 0");
@@ -184,6 +189,9 @@ void LaserDetector::lineSegmentsCallback(
     }
 
     ROS_INFO_STREAM("SUCCESSFULLY GET LINE PAIR");
+    auto get_line = high_resolution_clock::now();
+    auto getline_duration = duration_cast<microseconds>(get_line - start);
+    ROS_INFO_STREAM("--------get line period:" << getline_duration.count() << "----------");
 
     // 计算目标点
     float mid_x = (line1.x + line2.x) / 2;
@@ -199,8 +207,14 @@ void LaserDetector::lineSegmentsCallback(
     float steer_angle = atan(2 * wheel_base_ * (-y_target) /
                              (x_target_ * x_target_ + y_target * y_target));
     cmd.angular.z = - k_cmd_ * steer_angle;
-    cmd.linear.x = 0.2;
+    cmd.linear.x = speed_;
     cmd_pub_.publish(cmd);
+
+    auto get_cal = high_resolution_clock::now();
+    auto cal_duration = duration_cast<microseconds>(get_cal - get_line);
+    ROS_INFO_STREAM("--------calSteer period:" << cal_duration.count() << "----------");
+    auto total_duration = duration_cast<microseconds>(high_resolution_clock::now() - start);
+    ROS_INFO_STREAM("--------total period:" << total_duration.count() << "----------");
 
     if (debug_viz_) {
         populateMarkerMsg({line1, line2}, 'b');
@@ -214,7 +228,6 @@ void LaserDetector::populateMarkerMsg(const std::vector<Line> &lines, char color
     marker_msg.id = 0;
     marker_msg.type = visualization_msgs::Marker::LINE_LIST;
     marker_msg.scale.x = 0.1;
-    //marker_msg.pose.orientation.w = 1.0;
     if (color == 'g') {
         marker_msg.color.r = 0.0;
         marker_msg.color.g = 1.0;

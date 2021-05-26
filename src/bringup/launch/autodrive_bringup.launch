@@ -1,0 +1,14 @@
+<launch>
+  <!-- lane detection -->a
+  <include file="$(find lane_detection)/launch/lane_detection.launch"/>
+  
+  <!-- laser detection -->
+  <include file="$(find laser_detection)/launch/laser_detection.launch"/>
+
+  <!-- object detection -->
+  <include file="$(find yolov5)/launch/yolov5.launch"/>
+  <!-- include file="$(find traffic_detection_client)/launch/traffic_detection_client.launch"/-->
+
+  <!-- servo -->
+  <include file="$(find servo)/launch/servo.launch"/>
+</launch>

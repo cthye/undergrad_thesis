@@ -1,5 +1,5 @@
 # 调试选项
-debug_viz: 0 # 是否可视化
+debug_viz: 0  # 是否可视化
 viz_origin: 0
 viz_preprocess: 0
 viz_fit: 1
@@ -11,10 +11,10 @@ k_right: -1 # 右转比例系数
 y_offset: 50 #276 # 目标点y偏移值
 turn_thres: 1 # 转弯斜率阈值
 step_threshold: 200 #跳变距离阈值
-accmulated_not_step_frames: 3  #跳变稳定帧数
+accmulated_not_step_frames: 10  #跳变稳定帧数
 
 # 物理参数
-road_width: 500 #334 # pixel，路宽
+road_width: 550 #334 # pixel，路宽
 wheel_base: 570 # mm，轴心距
 dist_cv: 620 # mm, 相机坐标系与后轮轴心距离
 
@@ -51,7 +51,7 @@ use_otsu: 0
 gray_threshold: [200, 255]
 
 use_hsv: 1
-hsv_h_threshold: [0, 100]
+hsv_h_threshold: [0, 160]
 hsv_s_threshold: [0, 20]
 hsv_v_threshold: [200, 255]
 
@@ -72,3 +72,5 @@ inside_target_y_ratio: 0.5 # 内车道目标点的y比例
 outer_target_y_ratio: 0.125 # 外车道目标点的y比例
 turn_left_road_width_ratio: 1.4 # 转向时路宽比例
 turn_right_road_width_ratio: 0.9 # 转向时路宽比例
+
+speed: 0.2

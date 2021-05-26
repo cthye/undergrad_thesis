@@ -52,6 +52,7 @@ class LaneDetector:
             rospy.logfatal('Open videoCapture failed!')
             exit(-1)
 
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, cv2.VideoWriter_fourcc(*("MJPG")))
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH,  self.frame_width)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.frame_height)
 
@@ -103,6 +104,8 @@ class LaneDetector:
         self.inside_target_y_ratio = rospy.get_param('~inside_target_y_ratio')
         self.outer_target_y_ratio = rospy.get_param('~outer_target_y_ratio')
 
+        self.speed = rospy.get_param('~speed')
+
         # self.is_initial = True
         # self.target_lane = "outside"
         # self.target_LorR = -1
@@ -139,15 +142,15 @@ class LaneDetector:
         if ret:
             if self.viz_origin:
                 cv2.imshow('origin', img)
-            # begin_time=time.time()
+            begin = time.time()
             binary_warped = self.binaryzation(img)
-            # binaryzation_time=time.time()
-            # print('preprocess time',binaryzation_time-begin_time)
+            binary_finished = time.time()
+            print("binaryzation--- %s seconds ---" % (binary_finished - begin))
             # profile = line_profiler.LineProfiler(self.fitLine)
             # profile.enable()
             tmp = self.fitLine(binary_warped)
-            # fit_time=time.time()
-            # print('fitline time',fit_time-binaryzation_time)
+            fitline_finished = time.time()
+            print("fitline--- %s seconds ---" % (fitline_finished - binary_finished))
             # profile.disable()
             # profile.print_stats(sys.stdout)
             if tmp is None:
@@ -162,8 +165,9 @@ class LaneDetector:
                     self.cam_cmd.angular.y = 0
                     return
                 self.calcSteer(binary_warped, model, pixelX, pixelY)
-            # print('calcSteer time',time.time()-binaryzation_time)
-            # print('------------------------------total time-------------------------',time.time()-begin_time)
+            cal_finished = time.time()
+            print("calcSteer--- %s seconds ---" % (cal_finished - fitline_finished))
+            print('------------------------------total time-------------------------',time.time()-begin)
             if self.debug_viz:
                 if cv2.waitKey(1) == ord('s'):
                     cv2.waitKey(0)
@@ -179,7 +183,7 @@ class LaneDetector:
         if self.use_gray:
             gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             # img pre-process
-            # gray_img = cv2.equalizeHist(gray_img)
+            gray_img = cv2.equalizeHist(gray_img)
             origin_thr = np.zeros_like(gray_img)
             if self.use_otsu:
                 _, origin_thr = cv2.threshold(gray_img, 0, 255, cv2.THRESH_OTSU)
@@ -198,6 +202,7 @@ class LaneDetector:
         binary_warped=cv2.GaussianBlur(binary_warped,(7,7),0)
         if self.viz_preprocess and self.debug_viz:
             cv2.imshow('gray', origin_thr)
+            cv2.imshow('equalizaHist', gray_img)
             cv2.imshow('hsv', hsv_binary)
             cv2.imshow('preprocess', combined)
         return binary_warped
@@ -355,7 +360,7 @@ class LaneDetector:
 
         # if self.is_initial:
         #     self.cam_cmd.linear.z = 1
-        self.cam_cmd.linear.x = 0.2
+        self.cam_cmd.linear.x = self.speed
         self.cmd_pub.publish(self.cam_cmd)
         # if self.is_initial:
         #     self.cam_cmd.linear.z = 0

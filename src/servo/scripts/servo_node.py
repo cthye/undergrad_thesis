@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import rospy
-from std_msgs.msg import Int32
+from std_msgs.msg import Int8
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Bool
 from enum import Enum
@@ -16,7 +16,7 @@ class ControllerManager:
         self.laser_cmd_sub = rospy.Subscriber(
             self.laser_cmd_topic, Twist, self.laserCmdCallback, queue_size=1)
         self.traffic_data_sub = rospy.Subscriber(
-            self.traffic_data_topic, Int32, self.trafficDataCallback, queue_size=1)
+            self.traffic_data_topic, Int8, self.trafficDataCallback, queue_size=1)
         self.cmd_pub = rospy.Publisher(
             self.cmd_topic, Twist, queue_size=1)
 
@@ -119,8 +119,10 @@ class ControllerManager:
             self.state = State.LANE_CONTROL
         elif speed_limited:
             self.is_speed_limited = True
+            print("speed_limited")
         elif speed_unlimited:
             self.is_speed_limited = False
+            print("speed_unlimited")
 
     def adjust_speed(self):
         rospy.loginfo_throttle(5, "state:%s, speed:%s"%(self.state, self.vel_msg.linear.x))
