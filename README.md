@@ -1,4 +1,4 @@
-# undergrad_thesis
+# Undergrad Project
 
 With the gradual maturity of computer vision, cloud computing, modern sensing and other technologies, auto driving has achieved unimaginable fruits in the past ten years and is expected to be commercialized in the next ten years. Auto driving is an interdisciplinary field that integrates multiple disciplines, covering many disciplines and technologies such as computer vision, robotics systems, automation control, cloud computing, and vehicle engineering.
 
@@ -14,5 +14,5 @@ https://drive.google.com/file/d/1Pe8Dsc6lbKdyUyWnIogsUrzYk6PR2Itq/view?usp=shari
 ### Slide
 https://docs.google.com/presentation/d/1zivGw8TQb6oXZoA0O37_YKGpdFnCv_UKt1uKwIlSmiQ/edit?usp=sharing
 
-### Thesis Paper Link
+### Project Report Link
 https://drive.google.com/file/d/1qjYUsZSu3KZZfyvCQiMj4WBT7IPbDEN2/view?usp=sharing
