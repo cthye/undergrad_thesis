@@ -8,4 +8,11 @@ In this thesis, lane detection and path tracking are realized by Pure Pursuit al
 
 Keywords: Unmanned Ground Vehicle;Pure Pursuit Path Tracking;YOLOv5; Real-time Object Detection
 
-### demo link
+### Video Demo Link
+https://drive.google.com/file/d/1Pe8Dsc6lbKdyUyWnIogsUrzYk6PR2Itq/view?usp=sharing
+
+### Slide
+https://docs.google.com/presentation/d/1zivGw8TQb6oXZoA0O37_YKGpdFnCv_UKt1uKwIlSmiQ/edit?usp=sharing
+
+### Thesis Paper Link
+https://drive.google.com/file/d/1qjYUsZSu3KZZfyvCQiMj4WBT7IPbDEN2/view?usp=sharing
